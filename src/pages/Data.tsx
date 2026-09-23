@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import clsx from "clsx";
-import { AlertTriangle, CheckCircle2, Download, FileJson, Info, Landmark, Trash2, Upload } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Download, FileJson, FlaskConical, Info, Landmark, Trash2, Upload } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +16,7 @@ import { formatDate, formatMoney } from "@/lib/format";
 import { analyzeBankImport, applyBankImport, matchAccount, parseBankFile, suggestedAccount, type BankImportPlan } from "@/data/bankImport";
 import { SUPPORTED_BANKS, type BankImport } from "@/integrations/bank";
 import { Modal } from "@/components/ui/Modal";
+import { createDemoData, DEMO_ACCOUNT_ID, removeDemoData } from "@/data/demo";
 
 const MODES: { value: ImportMode; label: string; description: string }[] = [
   { value: "merge-keep-local", label: "Sloučit – ponechat moje data", description: "Přidá nové záznamy. Při shodě ID zůstane verze v tomto prohlížeči." },
@@ -31,6 +32,7 @@ export function Data() {
         <ExportCard />
         <ImportCard />
         <BankImportCard />
+        <DemoCard />
       </div>
       <DangerZone />
     </>
@@ -558,6 +560,61 @@ function BankImportPreview({
         <p className="text-xs text-amber-800">Vybraný účet je v jiné měně než výpis ({data.currency}).</p>
       )}
     </div>
+  );
+}
+
+/* ------------------------------ Testovací účet ------------------------------ */
+
+function DemoCard() {
+  const demo = useLiveQuery(async () => {
+    const account = await db.accounts.get(DEMO_ACCOUNT_ID);
+    return { exists: account !== undefined, count: await db.transactions.where("accountId").equals(DEMO_ACCOUNT_ID).count() };
+  });
+  const [busy, setBusy] = useState(false);
+
+  async function run(action: () => Promise<unknown>) {
+    setBusy(true);
+    try {
+      await action();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader
+        title="Testovací účet"
+        subtitle="Vymyšlená data za poslední rok na vyzkoušení aplikace: výplata 30 000 Kč, zhruba 40 výdajů měsíčně a platby s kamarády."
+      />
+      <div className="p-5">
+        <p className="flex gap-2 text-xs text-slate-500">
+          <FlaskConical className="size-4 shrink-0 text-slate-400" />
+          {demo?.exists
+            ? `Testovací účet existuje (${demo.count} transakcí). Jeho data se promítají do přehledů a statistik spolu se skutečnými.`
+            : "Vytvoří se samostatný účet „Testovací účet“. Tvoje skutečná data zůstanou beze změny a testovací půjdou kdykoli smazat."}
+        </p>
+        <div className="mt-4 flex flex-wrap justify-end gap-2">
+          {demo?.exists ? (
+            <>
+              <Button disabled={busy} onClick={() => run(() => createDemoData())}>Vygenerovat znovu</Button>
+              <Button
+                variant="secondary"
+                className="!text-red-600"
+                disabled={busy}
+                onClick={() => confirm("Smazat testovací účet a všechny jeho transakce?") && run(removeDemoData)}
+              >
+                <Trash2 className="size-4" /> Smazat testovací účet
+              </Button>
+            </>
+          ) : (
+            <Button variant="primary" disabled={busy || !demo} onClick={() => run(() => createDemoData())}>
+              <FlaskConical className="size-4" /> Vytvořit testovací účet
+            </Button>
+          )}
+        </div>
+      </div>
+    </Card>
   );
 }
 
