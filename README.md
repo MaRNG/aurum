@@ -26,6 +26,7 @@ Nová verze se nainstaluje až po potvrzení v hlášce „Je k dispozici nová 
 | `src/data/` | JSON záloha: formát (`format.ts`), migrace starších verzí (`migrations.ts`), export/validace/náhled/import (`backup.ts`) |
 | `src/integrations/bank/` | CSV výpisy bank: rozpoznání formátu (`index.ts`), KB+ (`kbCsv.ts`), Česká spořitelna (`csCsv.ts`), společné pomůcky a hash (`csv.ts`); rozhraní budoucích API adaptérů (`BankAdapter`) |
 | `src/data/bankImport.ts` | Náhled a zápis bankovního importu (deduplikace podle ID) |
+| `src/data/demo.ts` | Testovací účet s vymyšlenými daty za poslední rok (Data → Testovací účet) |
 | `src/features/` | Znovupoužitelné bloky UI: formulář a tabulka transakcí, grafy, insights |
 | `src/pages/` | Obrazovky (Přehled, Měsíce, Detail měsíce, Transakce, Nastavení, placeholdery dalších fází) |
 
@@ -48,18 +49,25 @@ Nová verze se nainstaluje až po potvrzení v hlášce „Je k dispozici nová 
 
 ## Nasazení (produkce: https://aurum.marng.dev)
 
-Server `marng-contabo` (Debian 13, Caddy; konvence v `/www/AI/` na serveru). Deployer je zatím rsync, později git.
+Server `marng-contabo` (Debian 13, Caddy; konvence v `/www/AI/` na serveru). Nasazuje se **z gitu**:
+server si stáhne commit z GitHubu (`git@github.com:MaRNG/aurum.git`) a sám ho postaví.
+Nasadí se jen to, co je pushnuté – skript odmítne nasadit větev s nepushnutými commity.
 
 ```bash
-npm run deploy                 # typecheck + testy + build + nahrání nové verze + ověření
-npm run deploy -- --skip-tests # bez testů
-bash deploy/deploy.sh rollback # přepnout zpět na předchozí verzi
-bash deploy/deploy.sh releases # výpis verzí na serveru
-bash deploy/deploy.sh setup    # jednorázová příprava serveru (idempotentní)
+git push                                   # nasazuje se z GitHubu
+npm run deploy                             # main: npm ci + testy + build na serveru, přepnutí verze, ověření
+npm run deploy -- --skip-tests             # bez testů (typecheck proběhne v buildu vždy)
+bash deploy/deploy.sh deploy --ref v1.2    # konkrétní větev, tag nebo commit
+bash deploy/deploy.sh check                # zkušební build na serveru, web se nepřepne
+bash deploy/deploy.sh rollback             # přepnout zpět na předchozí verzi
+bash deploy/deploy.sh releases             # výpis verzí na serveru i s commitem
+bash deploy/deploy.sh setup                # jednorázová příprava serveru (idempotentní)
 ```
 
-- Každé nasazení = nová složka `/www/aurum.marng.dev/releases/<datum-čas>/www/`, symlink `current` se přepne
-  atomicky až po úplném nahrání. Drží se 5 posledních verzí, nezměněné soubory se hardlinkují.
+- Server drží mirror repozitáře v `/www/aurum.marng.dev/repo.git` (root, stahuje přes root deploy klíč
+  `~/.ssh/marng-github`). Build běží v dočasném `build/<id>/` pod uživatelem projektu, ne pod rootem.
+- Každé nasazení = nová složka `/www/aurum.marng.dev/releases/<datum-čas>-<commit>/www/` + soubor `REVISION`
+  s hashem commitu; symlink `current` se přepne atomicky až po úspěšném buildu. Drží se 5 posledních verzí.
 - Konfigurace webu je v repozitáři (`deploy/aurum.marng.dev.caddy`), na server ji nahrává `setup`.
   Setup ověří konfiguraci pod uživatelem `caddy` a pokud by Caddy nenaběhl, vrátí původní stav.
 - Web patří uživateli `www-aurummarngdev` (práva 750/640), Caddy je členem jeho skupiny.
