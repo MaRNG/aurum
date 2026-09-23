@@ -1,0 +1,122 @@
+{
+  "title": "Nový vizuální svět pro Aurum",
+  "question": "Kostky přidělily směr „Statistická ročenka“. Ponechat, vzít alternativu, nebo hodit znovu?",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Statistická ročenka",
+      "kicker": "THE ROLL",
+      "lineage": "Statistické ročenky ČSÚ a metodické přílohy datových publikací",
+      "thesis": "Tvoje finance jako ročenka: číslované tabulky a grafy, každé číslo s poznámkou, jak vzniklo.",
+      "palette": ["#fbfbf9", "#1b1f24", "#2c3d8f", "#b07d1e", "#2f7d5b", "#b4532a"],
+      "materials": ["offsetový papír bez lesku", "tabulkové linky", "číslované poznámky ¹)", "šrafovaný odhad"],
+      "viewport": "Záhlaví kapitoly „1 Přehled · září 2026“, pod ním jeden linkovaný pruh souhrnu (příjmy, výdaje, bilance, úspory, rezerva, odhad) velkými tabulkovými číslicemi s odkazy na poznámky; pod ním Graf 1 a Tab. 2 kategorie jako pruhová tabulka.",
+      "risk": "Při nesmělém provedení sklouzne k šedé úřední tabulce; drží to jen velká čísla a přísná mřížka.",
+      "raised": [
+        { "from": "Normalizované propojovací pole", "raise": "Stav se kreslí vzorem, ne jen barvou: skutečnost plná, odhad šrafovaný, převod čárkovaný – všude stejně." },
+        { "from": "Teplá spotřebitelská aplikace", "raise": "Jediná akční barva (modrá) patří výhradně tomu, na co jde kliknout." },
+        { "from": "Horizont cyklorámy", "raise": "Měsíc má pojmenované fáze (průběžný / uzavřený / zkontrolovaný) viditelné v obsahu i záhlaví." }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Účetní deník",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "sloupcové účetní knihy a pokladní deníky",
+      "thesis": "Každý měsíc je list deníku: sloupce Má dáti / Dal, součty podtržené dvojitou linkou.",
+      "palette": ["#f4f6f2", "#1d2a24", "#3f7d5e", "#a4322a"],
+      "materials": ["zelené sloupcové linky", "červený a černý inkoust", "dvojité podtržení součtu"],
+      "viewport": "List „Září 2026“ se sloupci příjmy/výdaje/zůstatek, součtový řádek s dvojitou linkou nahoře jako souhrn.",
+      "risk": "Nejvíc očekávaný finanční motiv; snadno působí jako skeuomorfní kostým."
+    },
+    {
+      "id": "challenger-warm-consumer",
+      "label": "Teplá spotřebitelská aplikace",
+      "verdict": "competitive",
+      "lineage": "moderní spotřebitelské finanční aplikace",
+      "thesis": "Měkké karty na teplém podkladu, jedna sytá akční barva, lidské popisky.",
+      "palette": ["#f6f1ea", "#ffffff", "#1f1f1f", "#3d5afe"],
+      "materials": ["velké rádiusy", "bílé karty", "spodní lišta"],
+      "viewport": "Sloupec karet s jednou myšlenkou na kartu, spodní navigace.",
+      "case": "Nováček se v ní vyzná hned (drží identifikaci), ale na desktopovou měsíční kontrolu s hustými tabulkami ztrácí na srozumitelnosti.",
+      "risk": "Mobilní vzor na desktopovém nástroji; blízko současnému AI vzhledu."
+    },
+    {
+      "id": "challenger-jackfield",
+      "label": "Normalizované propojovací pole",
+      "verdict": "declined",
+      "lineage": "patchbay rozpis ve strojovně",
+      "thesis": "Nastavení jako propojovací pole, stav čárou.",
+      "palette": ["#0b0b0c", "#f2a33a"],
+      "materials": ["černé sklo", "jantarové linky"],
+      "viewport": "Číslované pruhy na černém skle.",
+      "case": "Uživatel osobních financí se s rozvaděčem neztotožní; čísla by zanikla.",
+      "kept": "Stav kódovaný vzorem čáry, ne barvou.",
+      "risk": "Kostým."
+    },
+    {
+      "id": "challenger-darkroom",
+      "label": "Temná komora",
+      "verdict": "declined",
+      "lineage": "fotokomora pod bezpečnostním světlem",
+      "thesis": "Práce po stanicích, nevratné body.",
+      "palette": ["#c46a1c", "#2b2b2b", "#e9e6df"],
+      "materials": ["jantarové světlo", "stříbrné tóny"],
+      "viewport": "Stanice v řadě.",
+      "case": "Jantarová plocha zničí čitelnost čísel a sémantiku barev.",
+      "kept": "Náhled před nevratným krokem (import) jako zkušební proužek.",
+      "risk": "Nečitelné."
+    },
+    {
+      "id": "challenger-generative",
+      "label": "Generativní identita",
+      "verdict": "declined",
+      "lineage": "parametrické značky",
+      "thesis": "Značka se přepočítává ze vstupů.",
+      "palette": ["#6c5ce7", "#00b894", "#fdcb6e"],
+      "materials": ["plochý vektor"],
+      "viewport": "Animovaná značka v navigaci.",
+      "case": "Proměnlivá paleta je v rozporu s důvěrou v čísla.",
+      "kept": "Jeden zdroj tokenů řídí barvy grafů i UI.",
+      "risk": "Nestabilní."
+    },
+    {
+      "id": "challenger-streetwear",
+      "label": "Industriální streetwear",
+      "verdict": "declined",
+      "lineage": "industriální móda s citacemi",
+      "thesis": "Slova v uvozovkách, výstražné pruhy.",
+      "palette": ["#ffffff", "#000000", "#ff6a13"],
+      "materials": ["výstražné pruhy", "visačky"],
+      "viewport": "Štítky v uvozovkách.",
+      "case": "Hlučné, proti principu „klid místo alarmu“.",
+      "kept": "Orientace čtením: každá zóna nese doslovný název.",
+      "risk": "Křik."
+    },
+    {
+      "id": "challenger-cyclorama",
+      "label": "Horizont cyklorámy",
+      "verdict": "declined",
+      "lineage": "divadelní svícení horizontu",
+      "thesis": "Atmosféra po fázích noc–úsvit–den.",
+      "palette": ["#050507", "#1e3a8a", "#e11d74", "#ffffff"],
+      "materials": ["světelné pásy"],
+      "viewport": "Horizontální pásy od tmy ke světlu.",
+      "case": "Nálada místo informace.",
+      "kept": "Pojmenované diskrétní fáze stavu.",
+      "risk": "Dekorace."
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "canon": true,
+  "canonCard": {
+    "label": "Standard kategorie",
+    "thesis": "Čistý fintech dashboard: bílé karty, KPI dlaždice, donut, jedna modrá.",
+    "palette": ["#ffffff", "#111827", "#2563eb"],
+    "materials": ["karty se stínem", "KPI dlaždice"],
+    "viewport": "Čtyři KPI karty, pod nimi graf a donut.",
+    "risk": "K nerozeznání od konkurence – a od současné verze."
+  },
+  "steer": true
+}

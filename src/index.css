@@ -1,0 +1,115 @@
+@import "tailwindcss";
+@import "@fontsource-variable/hanken-grotesk/wght.css";
+
+/*
+ * Aurum – přístroj, ne dashboard. Hliníkové tělo (casing), matné bílé panely spojené spárou,
+ * jeden tmavý displej a jediná funkční žlutá pro hlavní akci (klávesa „=“).
+ */
+@theme {
+  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Teplá neutrální škála – nahrazuje studenou slate v celé aplikaci */
+  --color-slate-50: #f6f5f2;
+  --color-slate-100: #edece8;
+  --color-slate-200: #dddbd5;
+  --color-slate-300: #c6c4bc;
+  --color-slate-400: #77756c;
+  --color-slate-500: #69675f;
+  --color-slate-600: #55534d;
+  --color-slate-700: #42413c;
+  --color-slate-800: #2e2d2a;
+  --color-slate-900: #1e1d1b;
+  --color-slate-950: #141412;
+
+  /* Grafit (dříve navy) – displej, tmavé plochy */
+  --color-navy-950: #141412;
+  --color-navy-900: #22221f;
+  --color-navy-800: #2e2e2a;
+  --color-navy-700: #3c3b37;
+
+  --color-casing: #e5e4df;
+  --color-casing-deep: #d9d8d2;
+  --color-face: #ffffff;
+  --color-display: #22221f;
+  --color-display-ink: #f3f1ea;
+  --color-display-dim: #a8a69c;
+
+  /* Funkční žlutá – výhradně pro hlavní akci */
+  --color-key: #f2b632;
+  --color-key-hover: #e8a817;
+  --color-key-ink: #1e1d1b;
+
+  --color-income: #4a8c3f;
+  --color-income-ink: #36702c;
+  --color-expense: #d9482b;
+  --color-expense-ink: #b0381d;
+  --color-net: #3a3934;
+  --color-net-ink: #1e1d1b;
+  --color-transfer: #8c8a81;
+
+  --shadow-card: 0 1px 0 rgb(30 29 27 / 0.05);
+  --shadow-key: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 1px 1px rgb(30 29 27 / 0.18), 0 2px 6px -2px rgb(30 29 27 / 0.2);
+  --shadow-key-pressed: inset 0 1px 2px rgb(30 29 27 / 0.25);
+  --shadow-well: inset 0 1px 2px rgb(30 29 27 / 0.08);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-casing text-slate-900 antialiased;
+  font-feature-settings: "tnum" 1;
+  caret-color: var(--color-key-hover);
+}
+
+::selection {
+  background: rgb(242 182 50 / 0.45);
+  color: var(--color-slate-950);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-slate-900);
+  outline-offset: 2px;
+}
+
+html {
+  scrollbar-color: var(--color-slate-300) transparent;
+  accent-color: var(--color-slate-900);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Textový odkaz – grafit s podtržením, žádná modrá */
+.link {
+  @apply font-medium text-slate-900 underline decoration-slate-300 underline-offset-3 transition-colors hover:decoration-slate-900;
+}
+
+/* Kontrolka: malá kulatá „LED“ nesoucí stav */
+.lamp {
+  @apply inline-block size-2 shrink-0 rounded-full;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+
+/* Perforovaná mřížka reproduktoru – jediná textura */
+.grille {
+  background-image: radial-gradient(circle, var(--color-slate-300) 1.1px, transparent 1.4px);
+  background-size: 7px 7px;
+}
+
+/* Odhad = šrafovaná výplň, skutečnost = plná */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, currentColor 0 1.5px, transparent 1.5px 5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

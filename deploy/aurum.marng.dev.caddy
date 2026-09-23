@@ -1,0 +1,38 @@
+# Aurum – statická React SPA (PWA). Spravováno z repozitáře: deploy/aurum.marng.dev.caddy
+# Nasazuje `deploy/deploy.sh setup`, ručně needitovat na serveru.
+aurum.marng.dev {
+	root * /www/aurum.marng.dev/current/www
+	encode gzip zstd
+
+	# Klientský routing: neexistující cesty (/mesice, /transakce…) → index.html.
+	# Chybějící soubory v /assets/ vrací 404, ne HTML.
+	@spa {
+		not path /assets/*
+		not file
+	}
+	rewrite @spa /index.html
+
+	# Hashované assety se nemění; index.html, sw.js a manifest se musí vždy revalidovat,
+	# jinak by se neprojevila nová verze aplikace.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	@revalidate not path /assets/*
+	header @revalidate Cache-Control "no-cache"
+
+	@manifest path *.webmanifest
+	header @manifest Content-Type "application/manifest+json"
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	file_server
+
+	log {
+		output file /var/log/caddy/aurum.marng.dev.log
+	}
+}

@@ -1,0 +1,122 @@
+{
+  "title": "Nový vizuální svět pro Aurum – 2. kolo",
+  "question": "Moderní, ale ne AI slop. Kostky přidělily „Výkresová dokumentace“. Ponechat, vzít alternativu, nebo hodit znovu?",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Výkresová dokumentace",
+      "kicker": "THE ROLL",
+      "lineage": "současné architektonické výkresové sady (CAD listy, kóty, rohové razítko)",
+      "thesis": "Každá obrazovka je výkresový list: čistě bílá plocha, přesné černé linky, kóty ukazují, z čeho se číslo skládá.",
+      "palette": ["#ffffff", "#0e0f11", "#c8ccd1", "#1f45ff", "#16a36a", "#e2522d"],
+      "materials": ["tenké a silné linky (0,5 / 1,5 px)", "kótovací čáry s tečkami", "rohové razítko listu", "velké tabulkové číslice"],
+      "viewport": "Levý úzký rejstřík listů A-01…A-11; hlavní plocha: obří číslo bilance měsíce, pod ním kótovací pruh příjmy ⟷ výdaje ⟷ bilance, vpravo dole razítko listu (měsíc, stav, poslední kontrola).",
+      "risk": "Když se linky udělají moc jemné a šedé, působí to jako prázdná šablona; musí to táhnout velká čísla a kontrast.",
+      "raised": [
+        { "from": "Noční přístrojová deska", "raise": "Každý údaj nese hodnotu i trend (šipka a změna oproti průměru), ne jen samotné číslo." },
+        { "from": "Tensegritní sloup", "raise": "Každé číslo jde rozložit na složky: kliknutím se rozbalí jeho kóta (z čeho vzniklo)." },
+        { "from": "Hvězdný atlas", "raise": "Velikost značky na pevné stupnici nese váhu částky (kategorie jako úměrné pruhy, ne donut)." }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Kalkulačka Braun",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Dieter Rams / Dietrich Lubs, kalkulačka ET66",
+      "thesis": "Aplikace jako dobře navržený přístroj: teplá tmavě šedá, jedna oranžovo-žlutá funkční barva, displej s čísly.",
+      "palette": ["#2a2a28", "#e9e7e1", "#f2b632", "#5c9f5a", "#d7462b"],
+      "materials": ["matný plast", "konvexní tlačítka", "zelená/žlutá funkční klávesa", "displej"],
+      "viewport": "Souhrn měsíce jako displej přístroje nahoře, pod ním mřížka ovládacích bloků.",
+      "risk": "Nejvíc „designový“ a oblíbený moderní odkaz; hrozí retro kostým."
+    },
+    {
+      "id": "challenger-six-pack",
+      "label": "Noční přístrojová deska",
+      "verdict": "competitive",
+      "lineage": "šest základních letových přístrojů",
+      "thesis": "Šest klidných ukazatelů, každý drží jednu pravdu: bilance, rezerva, úspory, rozpočet, odhad, trend.",
+      "palette": ["#0b0d0c", "#f4f4f0", "#6cf0a0", "#f2a33a", "#e2473b"],
+      "materials": ["matně černý panel", "svítící stupnice", "tlumené ručičky"],
+      "viewport": "Dvě řady po třech ukazatelích přes celou šířku; pod nimi tabulky.",
+      "case": "Metafora „mít finance pod kontrolou“ sedí (drží srozumitelnost), ale tmavý kokpit veřejné uživatele spíš odradí.",
+      "risk": "Na tmavé ploše se husté tabulky čtou hůř."
+    },
+    {
+      "id": "challenger-kraftwerk",
+      "label": "Man-Machine",
+      "verdict": "declined",
+      "lineage": "identita kapely Kraftwerk",
+      "thesis": "Liniové diagramy na přísné mřížce.",
+      "palette": ["#000000", "#ffffff", "#e10600", "#ffc400"],
+      "materials": ["neonové linky", "ortogonální spoje"],
+      "viewport": "Číslované stopy na černé.",
+      "case": "Silný styl, ale uživatel financí se v něm nenajde.",
+      "kept": "Převody mezi účty kreslené jako ortogonální spoje na mřížce.",
+      "risk": "Kostým."
+    },
+    {
+      "id": "challenger-star-atlas",
+      "label": "Hvězdný atlas",
+      "verdict": "declined",
+      "lineage": "hvězdné mapy",
+      "thesis": "Hierarchie velikostí teček.",
+      "palette": ["#0d1633", "#f5f3ea", "#d9483b"],
+      "materials": ["souřadnicová síť"],
+      "viewport": "Mapa oblohy.",
+      "case": "Hezké, ale finance nejsou obloha.",
+      "kept": "Velikost na pevné stupnici nese váhu.",
+      "risk": "Nesrozumitelné."
+    },
+    {
+      "id": "challenger-ikeda",
+      "label": "Datamatics",
+      "verdict": "declined",
+      "lineage": "Ryoji Ikeda",
+      "thesis": "Čistě černobílé datové pole.",
+      "palette": ["#000000", "#ffffff"],
+      "materials": ["čárové kódy", "monospace"],
+      "viewport": "Stěna pruhů.",
+      "case": "Bez barvy nejde rozlišit příjem a výdaj; blikání proti klidu.",
+      "kept": "Tvrdý kontrast bez šedé mlhy.",
+      "risk": "Nečitelné."
+    },
+    {
+      "id": "challenger-alphabet",
+      "label": "Bouře písmen",
+      "verdict": "declined",
+      "lineage": "surreálná typografie",
+      "thesis": "Písmena jako hmota.",
+      "palette": ["#ffffff", "#0a0a0a", "#c9ccd1"],
+      "materials": ["monumentální grotesk"],
+      "viewport": "Slovo jako počasí.",
+      "case": "Nesedí úkolu ani publiku.",
+      "kept": "Hlavní číslo sázené monumentálně jako hmota stránky.",
+      "risk": "Chaos."
+    },
+    {
+      "id": "challenger-tensegrity",
+      "label": "Tensegritní sloup",
+      "verdict": "declined",
+      "lineage": "kinetická plastika",
+      "thesis": "Síly a protisíly.",
+      "palette": ["#e7e6e2", "#141414", "#d2312b"],
+      "materials": ["karbonové tyče", "červená lanka"],
+      "viewport": "Silový diagram.",
+      "case": "Metafora je přitažená.",
+      "kept": "Každé číslo dohledatelné k jeho složkám.",
+      "risk": "Nesrozumitelné."
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code", "toggle": false },
+  "canon": true,
+  "canonCard": {
+    "label": "Standard kategorie",
+    "thesis": "Čistý fintech dashboard: bílé karty, KPI dlaždice, donut, jedna modrá.",
+    "palette": ["#ffffff", "#111827", "#2563eb"],
+    "materials": ["karty se stínem", "KPI dlaždice"],
+    "viewport": "Čtyři KPI karty, pod nimi graf a donut.",
+    "risk": "K nerozeznání od konkurence – a od současné verze."
+  },
+  "steer": true
+}

@@ -1,0 +1,40 @@
+# Závislosti
+node_modules/
+
+# Build a cache
+dist/
+dev-dist/
+*.tsbuildinfo
+.vite/
+coverage/
+
+# Výstupy smoke testu (screenshoty)
+e2e/out/
+
+# Impeccable – lokální nastavení a pracovní soubory (DESIGN.md sidecar design.json a decision/ se verzují)
+.impeccable/config.local.json
+.impeccable/questions/
+.impeccable/review/
+.impeccable/surfaces/
+
+# Prostředí a tajemství
+.env
+.env.*
+!.env.example
+
+# Logy a dočasné soubory
+*.log
+npm-debug.log*
+tmp/
+temp/
+.cache/
+
+# Bankovní výpisy – osobní data nepatří do repozitáře
+*.csv
+
+# Editory a OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
