@@ -69,7 +69,59 @@ export const transactionsRepo = {
     return tx;
   },
 
+  /**
+   * Hromadná změna kategorie a/nebo účtu (`categoryId: null` = bez kategorie).
+   * Transakce, kde změna nedává smysl, se přeskočí: kategorie u převodu nebo kategorie
+   * jiného typu (příjmová u výdaje), převod se stejným zdrojovým a cílovým účtem.
+   */
+  async bulkUpdate(
+    ids: string[],
+    patch: { categoryId?: string | null; accountId?: string },
+  ): Promise<{ updated: number; skipped: number }> {
+    return db.transaction("rw", [db.transactions, db.categories, db.accounts], async () => {
+      const category = patch.categoryId ? await db.categories.get(patch.categoryId) : undefined;
+      if (patch.categoryId && !category) throw new Error("Kategorie neexistuje");
+      const account = patch.accountId ? await db.accounts.get(patch.accountId) : undefined;
+      if (patch.accountId && !account) throw new Error("Účet neexistuje");
+
+      const now = nowIso();
+      const out: Transaction[] = [];
+      let skipped = 0;
+      for (const existing of await db.transactions.bulkGet(ids)) {
+        if (!existing) continue;
+        const tx: Transaction = { ...existing, updatedAt: now };
+        let changed = false;
+        if (patch.categoryId !== undefined && existing.type === "transfer" && !account) {
+          skipped++;
+          continue;
+        }
+        if (patch.categoryId !== undefined && existing.type !== "transfer") {
+          if (category && category.type !== "both" && category.type !== existing.type) {
+            skipped++;
+            continue;
+          }
+          tx.categoryId = patch.categoryId ?? undefined;
+          changed ||= tx.categoryId !== existing.categoryId;
+        }
+        if (account) {
+          if (existing.type === "transfer" && existing.destinationAccountId === account.id) {
+            skipped++;
+            continue;
+          }
+          tx.accountId = account.id;
+          tx.currency = account.currency;
+          changed ||= account.id !== existing.accountId;
+        }
+        if (changed) out.push(transactionSchema.parse(normalizeTransaction(tx)));
+      }
+      await db.transactions.bulkPut(out);
+      return { updated: out.length, skipped };
+    });
+  },
+
   remove: (id: string) => db.transactions.delete(id),
+
+  bulkRemove: (ids: string[]) => db.transactions.bulkDelete(ids),
 };
 
 export const categoriesRepo = {

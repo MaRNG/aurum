@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import clsx from "clsx";
-import { ArrowDown, ArrowUp, Plus, Receipt, Search, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Plus, Receipt, Search, Trash2, X } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Field";
@@ -13,7 +13,7 @@ import type { Transaction } from "@/domain/schema";
 import { monthBounds } from "@/domain/months";
 import { formatMoney } from "@/lib/format";
 import { TransactionForm } from "@/features/TransactionForm";
-import { TransactionTable } from "@/features/TransactionTable";
+import { SelectBox, TransactionTable } from "@/features/TransactionTable";
 
 type SortKey = "date" | "description" | "category" | "type" | "amount" | "account" | "source";
 
@@ -53,6 +53,11 @@ export function Transactions() {
   const [duplicating, setDuplicating] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
 
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const [bulkCategory, setBulkCategory] = useState("");
+  const [bulkAccount, setBulkAccount] = useState("");
+  const [bulkNote, setBulkNote] = useState("");
+
   const catMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
   const accMap = useMemo(() => new Map(accounts.map((a) => [a.id, a])), [accounts]);
 
@@ -90,6 +95,48 @@ export function Transactions() {
     });
   }, [all, from, to, type, categoryId, accountId, query, sort, catMap, accMap]);
 
+  // Hromadné akce pracují jen s vybranými transakcemi, které odpovídají aktuálním filtrům.
+  const selectedIds = filtered.filter((t) => selected.has(t.id)).map((t) => t.id);
+  const allSelected = filtered.length > 0 && selectedIds.length === filtered.length;
+
+  const toggleOne = (tx: Transaction, checked: boolean) =>
+    setSelected((s) => {
+      const next = new Set(s);
+      if (checked) next.add(tx.id);
+      else next.delete(tx.id);
+      return next;
+    });
+  const clearSelection = () => {
+    setSelected(new Set());
+    setBulkCategory("");
+    setBulkAccount("");
+  };
+
+  const applyBulk = async () => {
+    const { updated, skipped } = await transactionsRepo.bulkUpdate(selectedIds, {
+      categoryId: bulkCategory === "" ? undefined : bulkCategory === "__none" ? null : bulkCategory,
+      accountId: bulkAccount || undefined,
+    });
+    const unchanged = selectedIds.length - updated - skipped;
+    setBulkNote(
+      [
+        `Upraveno ${updated} z ${selectedIds.length}`,
+        unchanged > 0 && `${unchanged} už nastavení mělo`,
+        skipped > 0 && `${skipped} přeskočeno (převod nebo kategorie jiného typu)`,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    );
+    clearSelection();
+  };
+
+  const removeBulk = async () => {
+    if (!confirm(`Opravdu smazat ${selectedIds.length} vybraných transakcí?`)) return;
+    await transactionsRepo.bulkRemove(selectedIds);
+    setBulkNote(`Smazáno ${selectedIds.length} transakcí`);
+    clearSelection();
+  };
+
   const totals = summarize("", filtered);
   const hasFilters = !!(from || to || type || categoryId || accountId || query);
 
@@ -104,6 +151,14 @@ export function Transactions() {
   const header = (
     <thead>
       <tr className="border-b border-slate-100 bg-slate-50/60 text-left text-xs text-slate-500">
+        <th className="w-0 py-3 pr-0 pl-4 font-medium">
+          <SelectBox
+            label={allSelected ? "Zrušit výběr" : `Vybrat všech ${filtered.length} transakcí`}
+            checked={allSelected}
+            indeterminate={selectedIds.length > 0 && !allSelected}
+            onChange={(c) => (c ? setSelected(new Set(filtered.map((t) => t.id))) : clearSelection())}
+          />
+        </th>
         {COLUMNS.map((c) => (
           <th key={c.key} className={clsx("px-4 py-3 font-medium", c.align === "right" && "text-right")}>
             {c.key === "actions" ? (
@@ -180,6 +235,55 @@ export function Transactions() {
         </div>
       </Card>
 
+      {selectedIds.length > 0 ? (
+        <Card className="sticky top-16 z-20 mb-4 lg:top-2 flex flex-wrap items-center gap-3 p-3">
+          <span className="px-1 text-sm font-medium text-slate-900">
+            Vybráno <span className="num">{selectedIds.length}</span>
+            {!allSelected && (
+              <button type="button" onClick={() => setSelected(new Set(filtered.map((t) => t.id)))} className="ml-2 text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline">
+                vybrat všech {filtered.length}
+              </button>
+            )}
+          </span>
+          <Select aria-label="Nastavit kategorii" value={bulkCategory} onChange={(e) => setBulkCategory(e.target.value)} className="w-56">
+            <option value="">Kategorie beze změny</option>
+            <option value="__none">— Bez kategorie</option>
+            {[...categories].sort((a, b) => a.name.localeCompare(b.name, "cs")).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+                {c.type === "income" ? " (příjem)" : c.type === "expense" ? " (výdaj)" : ""}
+              </option>
+            ))}
+          </Select>
+          <Select aria-label="Nastavit účet" value={bulkAccount} onChange={(e) => setBulkAccount(e.target.value)} className="w-48">
+            <option value="">Účet beze změny</option>
+            {accounts.filter((a) => !a.archived).map((a) => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+          </Select>
+          <Button size="sm" variant="primary" disabled={!bulkCategory && !bulkAccount} onClick={applyBulk}>
+            Použít
+          </Button>
+          <div className="ml-auto flex items-center gap-1">
+            <Button size="sm" variant="ghost" onClick={removeBulk} className="hover:!bg-expense/10 hover:!text-expense-ink">
+              <Trash2 className="size-3.5" /> Smazat
+            </Button>
+            <Button size="sm" variant="ghost" onClick={clearSelection}>
+              <X className="size-3.5" /> Zrušit výběr
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        bulkNote && (
+          <div className="mb-3 flex items-center gap-2 px-1 text-xs text-slate-600" role="status">
+            {bulkNote}
+            <button type="button" aria-label="Skrýt" onClick={() => setBulkNote("")} className="text-slate-400 hover:text-slate-900">
+              <X className="size-3" />
+            </button>
+          </div>
+        )
+      )}
+
       <Card className="overflow-hidden">
         {all === undefined ? null : filtered.length ? (
           <>
@@ -191,6 +295,8 @@ export function Transactions() {
               onEdit={(tx) => { setEditing(tx); setDuplicating(false); setFormOpen(true); }}
               onDuplicate={(tx) => { setEditing(tx); setDuplicating(true); setFormOpen(true); }}
               onDelete={(tx) => confirm("Opravdu smazat transakci?") && transactionsRepo.remove(tx.id)}
+              selected={selected}
+              onToggleSelect={toggleOne}
             />
             {filtered.length > limit && (
               <div className="border-t border-slate-100 p-3 text-center">

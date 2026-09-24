@@ -62,6 +62,33 @@ export function AccountLabel({ tx, accounts }: { tx: Transaction; accounts: Map<
   return from ? <>{from}</> : <span className="text-slate-400">—</span>;
 }
 
+/** Zaškrtávátko pro hromadný výběr; `indeterminate` jen u hlavičky. */
+export function SelectBox({
+  checked,
+  indeterminate = false,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  label: string;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <input
+      type="checkbox"
+      aria-label={label}
+      title={label}
+      className="size-4 cursor-pointer align-middle accent-navy-900"
+      checked={checked}
+      ref={(el) => {
+        if (el) el.indeterminate = indeterminate;
+      }}
+      onChange={(e) => onChange(e.target.checked)}
+    />
+  );
+}
+
 export interface Column {
   key: string;
   label: string;
@@ -76,6 +103,8 @@ export function TransactionTable({
   onEdit,
   onDuplicate,
   onDelete,
+  selected,
+  onToggleSelect,
   compact = false,
   header,
 }: {
@@ -85,6 +114,9 @@ export function TransactionTable({
   onEdit?: (tx: Transaction) => void;
   onDuplicate?: (tx: Transaction) => void;
   onDelete?: (tx: Transaction) => void;
+  /** Hromadný výběr: zobrazí sloupec se zaškrtávátky (vlastní `header` jej musí obsahovat taky). */
+  selected?: ReadonlySet<string>;
+  onToggleSelect?: (tx: Transaction, checked: boolean) => void;
   compact?: boolean;
   /** Vlastní hlavička (např. s řazením); jinak se vykreslí jednoduchá. */
   header?: ReactNode;
@@ -92,6 +124,7 @@ export function TransactionTable({
   const catMap = new Map(categories.map((c) => [c.id, c]));
   const accMap = new Map(accounts.map((a) => [a.id, a]));
   const cell = compact ? "px-5 py-2.5" : "px-4 py-3";
+  const selectable = !!(selected && onToggleSelect);
 
   return (
     <div className="overflow-x-auto">
@@ -99,6 +132,7 @@ export function TransactionTable({
         {header ?? (
           <thead>
             <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
+              {selectable && <th className={clsx(cell, "w-0 pr-0")} />}
               <th className={clsx(cell, "font-medium")}>Datum</th>
               <th className={clsx(cell, "font-medium")}>Popis</th>
               <th className={clsx(cell, "font-medium", compact && "max-sm:hidden")}>Kategorie</th>
@@ -118,7 +152,12 @@ export function TransactionTable({
         )}
         <tbody className="divide-y divide-slate-100">
           {transactions.map((tx) => (
-            <tr key={tx.id} className="group hover:bg-slate-50/70">
+            <tr key={tx.id} className={clsx("group", selected?.has(tx.id) ? "bg-slate-100/80" : "hover:bg-slate-50/70")}>
+              {selectable && (
+                <td className={clsx(cell, "w-0 pr-0")}>
+                  <SelectBox label="Vybrat transakci" checked={selected!.has(tx.id)} onChange={(c) => onToggleSelect!(tx, c)} />
+                </td>
+              )}
               <td className={clsx(cell, "num whitespace-nowrap text-slate-500")}>{formatDate(tx.date)}</td>
               <td className={clsx(cell, "max-w-64 truncate text-slate-900")}>{tx.description || <span className="text-slate-400">—</span>}</td>
               <td className={clsx(cell, "whitespace-nowrap text-slate-600", compact && "max-sm:hidden")}>
