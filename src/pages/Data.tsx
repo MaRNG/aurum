@@ -461,7 +461,8 @@ function BankImportPreview({
         <Landmark className="mt-0.5 size-5 text-net" />
         <div>
           <p className="font-medium">
-            {data.bankName} · účet {data.accountNumber}
+            {data.bankName}
+            {data.accountNumber && ` · účet ${data.accountNumber}`}
             {data.accountName && ` · ${data.accountName}`}
           </p>
           <p className="text-xs text-slate-500">

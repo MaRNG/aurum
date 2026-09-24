@@ -24,7 +24,7 @@ Nová verze se nainstaluje až po potvrzení v hlášce „Je k dispozici nová 
 | `src/db/` | Dexie databáze (`db.ts`), repozitáře – jediné místo zápisu, vše validované (`repositories.ts`), reaktivní hooky |
 | `src/domain/` (Fáze 3) | `accounts.ts` zůstatky a rezerva, `cashflow.ts` výkaz a pohyby po účtech, `forecast.ts` + `forecastModel.ts` predikce se zpětným testem, `scenarios.ts` scénáře „co kdyby“ |
 | `src/data/` | JSON záloha: formát (`format.ts`), migrace starších verzí (`migrations.ts`), export/validace/náhled/import (`backup.ts`) |
-| `src/integrations/bank/` | CSV výpisy bank: rozpoznání formátu (`index.ts`), KB+ (`kbCsv.ts`), Česká spořitelna (`csCsv.ts`), společné pomůcky a hash (`csv.ts`); rozhraní budoucích API adaptérů (`BankAdapter`) |
+| `src/integrations/bank/` | CSV výpisy bank: rozpoznání formátu (`index.ts`), KB+ (`kbCsv.ts`), Česká spořitelna (`csCsv.ts`), Trinity Bank (`trinityCsv.ts`), společné pomůcky a hash (`csv.ts`); rozhraní budoucích API adaptérů (`BankAdapter`) |
 | `src/data/bankImport.ts` | Náhled a zápis bankovního importu (deduplikace podle ID) |
 | `src/data/demo.ts` | Testovací účet s vymyšlenými daty za poslední rok (Data → Testovací účet) |
 | `src/features/` | Znovupoužitelné bloky UI: formulář a tabulka transakcí, grafy, insights |

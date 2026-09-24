@@ -53,10 +53,16 @@ export function suggestedAccount(data: BankImport): Omit<Account, "id"> {
   };
 }
 
-/** Účet založený importem má číslo účtu v názvu – při dalším importu se předvybere. */
+/**
+ * Účet založený importem má číslo účtu v názvu – při dalším importu se předvybere.
+ * Výpis bez čísla účtu (Trinity) se páruje s účtem pojmenovaným přesně podle návrhu.
+ */
 export function matchAccount(data: BankImport, accounts: Account[]): Account | undefined {
   const number = data.accountNumber;
-  return number ? accounts.find((a) => !a.archived && a.name.includes(number)) : undefined;
+  const active = accounts.filter((a) => !a.archived);
+  if (number) return active.find((a) => a.name.includes(number));
+  const name = suggestedAccount(data).name;
+  return active.find((a) => a.name === name);
 }
 
 export type BankImportTarget = { accountId: string } | { newAccount: Omit<Account, "id"> };
