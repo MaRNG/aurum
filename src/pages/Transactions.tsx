@@ -295,6 +295,7 @@ export function Transactions() {
               onEdit={(tx) => { setEditing(tx); setDuplicating(false); setFormOpen(true); }}
               onDuplicate={(tx) => { setEditing(tx); setDuplicating(true); setFormOpen(true); }}
               onDelete={(tx) => confirm("Opravdu smazat transakci?") && transactionsRepo.remove(tx.id)}
+              onCategoryChange={(tx, id) => transactionsRepo.bulkUpdate([tx.id], { categoryId: id })}
               selected={selected}
               onToggleSelect={toggleOne}
             />

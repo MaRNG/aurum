@@ -62,6 +62,41 @@ export function AccountLabel({ tx, accounts }: { tx: Transaction; accounts: Map<
   return from ? <>{from}</> : <span className="text-slate-400">—</span>;
 }
 
+/**
+ * Kategorie jako klikací štítek: přes něj leží neviditelný nativní select, takže klik na název
+ * (nebo na pomlčku u transakce bez kategorie) rovnou otevře výběr.
+ */
+function CategoryPicker({
+  tx,
+  category,
+  options,
+  onChange,
+}: {
+  tx: Transaction;
+  category: Category | undefined;
+  options: Category[];
+  onChange: (categoryId: string | null) => void;
+}) {
+  const fitting = options.filter((c) => c.type === "both" || c.type === tx.type || c.id === tx.categoryId);
+  return (
+    <span className="relative -mx-1.5 inline-flex rounded-md px-1.5 py-0.5 transition-colors hover:bg-slate-900/6 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-slate-900/20">
+      <CategoryLabel category={category} />
+      <select
+        aria-label="Kategorie"
+        title="Změnit kategorii"
+        value={tx.categoryId ?? ""}
+        onChange={(e) => onChange(e.target.value || null)}
+        className="absolute inset-0 w-full cursor-pointer opacity-0"
+      >
+        <option value="">— Bez kategorie</option>
+        {fitting.map((c) => (
+          <option key={c.id} value={c.id}>{c.name}</option>
+        ))}
+      </select>
+    </span>
+  );
+}
+
 /** Zaškrtávátko pro hromadný výběr; `indeterminate` jen u hlavičky. */
 export function SelectBox({
   checked,
@@ -103,6 +138,7 @@ export function TransactionTable({
   onEdit,
   onDuplicate,
   onDelete,
+  onCategoryChange,
   selected,
   onToggleSelect,
   compact = false,
@@ -114,6 +150,8 @@ export function TransactionTable({
   onEdit?: (tx: Transaction) => void;
   onDuplicate?: (tx: Transaction) => void;
   onDelete?: (tx: Transaction) => void;
+  /** Když je zadané, kategorie jde měnit přímo v tabulce. */
+  onCategoryChange?: (tx: Transaction, categoryId: string | null) => void;
   /** Hromadný výběr: zobrazí sloupec se zaškrtávátky (vlastní `header` jej musí obsahovat taky). */
   selected?: ReadonlySet<string>;
   onToggleSelect?: (tx: Transaction, checked: boolean) => void;
@@ -124,6 +162,7 @@ export function TransactionTable({
   const catMap = new Map(categories.map((c) => [c.id, c]));
   const accMap = new Map(accounts.map((a) => [a.id, a]));
   const cell = compact ? "px-5 py-2.5" : "px-4 py-3";
+  const sortedCategories = onCategoryChange ? [...categories].sort((a, b) => a.name.localeCompare(b.name, "cs")) : [];
   const selectable = !!(selected && onToggleSelect);
 
   return (
@@ -161,7 +200,18 @@ export function TransactionTable({
               <td className={clsx(cell, "num whitespace-nowrap text-slate-500")}>{formatDate(tx.date)}</td>
               <td className={clsx(cell, "max-w-64 truncate text-slate-900")}>{tx.description || <span className="text-slate-400">—</span>}</td>
               <td className={clsx(cell, "whitespace-nowrap text-slate-600", compact && "max-sm:hidden")}>
-                {tx.type === "transfer" ? <span className="text-slate-400">Převod</span> : <CategoryLabel category={tx.categoryId ? catMap.get(tx.categoryId) : undefined} />}
+                {tx.type === "transfer" ? (
+                  <span className="text-slate-400">Převod</span>
+                ) : onCategoryChange ? (
+                  <CategoryPicker
+                    tx={tx}
+                    category={tx.categoryId ? catMap.get(tx.categoryId) : undefined}
+                    options={sortedCategories}
+                    onChange={(id) => onCategoryChange(tx, id)}
+                  />
+                ) : (
+                  <CategoryLabel category={tx.categoryId ? catMap.get(tx.categoryId) : undefined} />
+                )}
               </td>
               {!compact && (
                 <td className={cell}>
