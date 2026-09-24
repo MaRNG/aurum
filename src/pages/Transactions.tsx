@@ -50,6 +50,7 @@ export function Transactions() {
   const [limit, setLimit] = useState(PAGE_SIZE);
 
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const [duplicating, setDuplicating] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
 
   const catMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
@@ -129,7 +130,7 @@ export function Transactions() {
         title="Transakce"
         subtitle="Všechny příjmy, výdaje a převody."
         actions={
-          <Button variant="primary" onClick={() => { setEditing(null); setFormOpen(true); }}>
+          <Button variant="primary" onClick={() => { setEditing(null); setDuplicating(false); setFormOpen(true); }}>
             <Plus className="size-4" /> Nová transakce
           </Button>
         }
@@ -187,7 +188,8 @@ export function Transactions() {
               transactions={filtered.slice(0, limit)}
               categories={categories}
               accounts={accounts}
-              onEdit={(tx) => { setEditing(tx); setFormOpen(true); }}
+              onEdit={(tx) => { setEditing(tx); setDuplicating(false); setFormOpen(true); }}
+              onDuplicate={(tx) => { setEditing(tx); setDuplicating(true); setFormOpen(true); }}
               onDelete={(tx) => confirm("Opravdu smazat transakci?") && transactionsRepo.remove(tx.id)}
             />
             {filtered.length > limit && (
@@ -205,7 +207,7 @@ export function Transactions() {
         )}
       </Card>
 
-      <TransactionForm open={formOpen} transaction={editing} onClose={() => setFormOpen(false)} />
+      <TransactionForm open={formOpen} transaction={editing} duplicate={duplicating} onClose={() => setFormOpen(false)} />
     </>
   );
 }

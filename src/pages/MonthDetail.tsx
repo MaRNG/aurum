@@ -32,6 +32,7 @@ export function MonthDetail() {
   const status = statuses.find((s) => s.month === month);
 
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const [duplicating, setDuplicating] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
 
   const sorted = useMemo(() => [...(txs ?? [])].sort((a, b) => b.date.localeCompare(a.date)), [txs]);
@@ -101,7 +102,7 @@ export function MonthDetail() {
         <CardHeader
           title="Transakce"
           action={
-            <Button size="sm" variant="primary" onClick={() => { setEditing(null); setFormOpen(true); }}>
+            <Button size="sm" variant="primary" onClick={() => { setEditing(null); setDuplicating(false); setFormOpen(true); }}>
               <Plus className="size-3.5" /> Přidat
             </Button>
           }
@@ -112,7 +113,8 @@ export function MonthDetail() {
               transactions={sorted}
               categories={categories}
               accounts={accounts}
-              onEdit={(tx) => { setEditing(tx); setFormOpen(true); }}
+              onEdit={(tx) => { setEditing(tx); setDuplicating(false); setFormOpen(true); }}
+              onDuplicate={(tx) => { setEditing(tx); setDuplicating(true); setFormOpen(true); }}
               onDelete={(tx) => confirm("Opravdu smazat transakci?") && transactionsRepo.remove(tx.id)}
             />
           ) : (
@@ -124,6 +126,7 @@ export function MonthDetail() {
       <TransactionForm
         open={formOpen}
         transaction={editing}
+        duplicate={duplicating}
         defaultDate={month === currentMonthKey() ? undefined : from}
         onClose={() => setFormOpen(false)}
       />

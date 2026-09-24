@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ArrowLeftRight, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeftRight, Copy, Pencil, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Account, Category, Transaction } from "@/domain/schema";
 import { formatDate, formatMoney } from "@/lib/format";
@@ -74,6 +74,7 @@ export function TransactionTable({
   categories,
   accounts,
   onEdit,
+  onDuplicate,
   onDelete,
   compact = false,
   header,
@@ -82,6 +83,7 @@ export function TransactionTable({
   categories: Category[];
   accounts: Account[];
   onEdit?: (tx: Transaction) => void;
+  onDuplicate?: (tx: Transaction) => void;
   onDelete?: (tx: Transaction) => void;
   compact?: boolean;
   /** Vlastní hlavička (např. s řazením); jinak se vykreslí jednoduchá. */
@@ -141,6 +143,11 @@ export function TransactionTable({
                       {onEdit && (
                         <IconButton label="Upravit" onClick={() => onEdit(tx)}>
                           <Pencil className="size-3.5" />
+                        </IconButton>
+                      )}
+                      {onDuplicate && (
+                        <IconButton label="Duplikovat" onClick={() => onDuplicate(tx)}>
+                          <Copy className="size-3.5" />
                         </IconButton>
                       )}
                       {onDelete && (

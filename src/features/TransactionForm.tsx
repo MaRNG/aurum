@@ -48,11 +48,14 @@ export function TransactionForm({
   transaction,
   defaultDate,
   defaultAccountId: preferredAccountId,
+  duplicate = false,
   onClose,
 }: {
   open: boolean;
   /** `null` = nová transakce */
   transaction: Transaction | null;
+  /** `transaction` slouží jen jako předloha – uloží se jako nová (ruční) transakce */
+  duplicate?: boolean;
   defaultDate?: string;
   /** předvybraný účet u nové transakce */
   defaultAccountId?: string;
@@ -78,7 +81,7 @@ export function TransactionForm({
     }
     // Reset jen při otevření – ne při každé změně seznamu účtů.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, transaction]);
+  }, [open, transaction, duplicate]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -113,7 +116,7 @@ export function TransactionForm({
 
     setSaving(true);
     try {
-      if (transaction) await transactionsRepo.update(transaction.id, input);
+      if (transaction && !duplicate) await transactionsRepo.update(transaction.id, input);
       else await transactionsRepo.create(input);
       onClose();
     } catch (err) {
@@ -135,7 +138,7 @@ export function TransactionForm({
   return (
     <Modal
       open={open}
-      title={transaction ? "Upravit transakci" : "Nová transakce"}
+      title={duplicate ? "Duplikovat transakci" : transaction ? "Upravit transakci" : "Nová transakce"}
       onClose={onClose}
       footer={
         <>
@@ -143,7 +146,7 @@ export function TransactionForm({
             Zrušit
           </Button>
           <Button variant="primary" type="submit" form="tx-form" disabled={saving}>
-            {transaction ? "Uložit změny" : "Přidat transakci"}
+            {duplicate ? "Vytvořit kopii" : transaction ? "Uložit změny" : "Přidat transakci"}
           </Button>
         </>
       }

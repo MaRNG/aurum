@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import clsx from "clsx";
-import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, Pencil, Plus, Trash2 } from "lucide-react";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button, IconButton } from "@/components/ui/Button";
 import { EmptyState, PageHeader } from "@/components/ui/PageHeader";
@@ -26,6 +26,7 @@ export function AccountDetail() {
   const account = accounts.find((a) => a.id === id);
   const [editing, setEditing] = useState(false);
   const [txEdit, setTxEdit] = useState<Transaction | null | "new">(null);
+  const [txDuplicate, setTxDuplicate] = useState(false);
   const [limit, setLimit] = useState(PAGE);
 
   const view = useMemo(() => {
@@ -157,8 +158,11 @@ export function AccountDetail() {
                       {known && <td className="num px-5 py-2.5 text-right whitespace-nowrap text-slate-600">{formatMoney(balance, account.currency)}</td>}
                       <td className="w-0 px-3 py-2.5 whitespace-nowrap">
                         <div className="flex justify-end gap-0.5 opacity-60 group-hover:opacity-100">
-                          <IconButton label="Upravit" onClick={() => setTxEdit(tx)}>
+                          <IconButton label="Upravit" onClick={() => { setTxDuplicate(false); setTxEdit(tx); }}>
                             <Pencil className="size-3.5" />
+                          </IconButton>
+                          <IconButton label="Duplikovat" onClick={() => { setTxDuplicate(true); setTxEdit(tx); }}>
+                            <Copy className="size-3.5" />
                           </IconButton>
                           <IconButton label="Smazat" onClick={() => confirm("Opravdu smazat transakci?") && transactionsRepo.remove(tx.id)} className="hover:!bg-red-50 hover:!text-red-600">
                             <Trash2 className="size-3.5" />
@@ -185,6 +189,7 @@ export function AccountDetail() {
       <TransactionForm
         open={txEdit !== null}
         transaction={txEdit === "new" ? null : txEdit}
+        duplicate={txDuplicate && txEdit !== "new"}
         defaultAccountId={account.id}
         onClose={() => setTxEdit(null)}
       />

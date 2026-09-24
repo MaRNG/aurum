@@ -121,6 +121,15 @@ await page.type("dialog input[placeholder^='Např']", "Offline nákup");
 await page.evaluate(() => [...document.querySelectorAll("dialog button")].find((b) => b.textContent.includes("Přidat transakci")).click());
 await wait(500);
 check("offline: transakce se uloží", (await text()).includes("Offline nákup"));
+await page.evaluate(() =>
+  [...document.querySelectorAll("tr")].find((r) => r.textContent.includes("Offline nákup")).querySelector("button[aria-label=Duplikovat]").click(),
+);
+await wait(300);
+check("duplikace: dialog je předvyplněný", (await page.$eval("dialog input[placeholder^='Např']", (i) => i.value)) === "Offline nákup");
+await page.type("dialog input[placeholder^='Např']", " – kopie");
+await page.evaluate(() => [...document.querySelectorAll("dialog button")].find((b) => b.textContent.includes("Vytvořit kopii")).click());
+await wait(500);
+check("duplikace: kopie se uloží a originál zůstane", (await text()).includes("Offline nákup – kopie") && (await text()).split("Offline nákup").length === 3);
 await page.goto(base + "/statistiky/kategorie", { waitUntil: "domcontentloaded" });
 await wait(1500);
 check("offline: statistiky (líně načtená stránka) fungují", (await text()).includes("Vývoj kategorií v čase"));
